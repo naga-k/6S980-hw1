@@ -56,7 +56,11 @@ def project(
 ) -> Float[Tensor, "*batch 2"]:
     """Project homogenized 3D points in camera coordinates to pixel coordinates."""
 
-    projection_matrix = cat((intrinsics, zeros(intrinsics.shape[:-1] + (1,))), dim=-1)
+    # projection_matrix = cat((intrinsics, zeros(intrinsics.shape[:-1] + (1,))), dim=-1)
+    projection_matrix = homogenize_vectors(intrinsics)
+    # print(projection_matrix.shape)
     homo_coords = einsum("...ij,...j->...i", projection_matrix, xyz)
-    img_coords = homo_coords[..., :2] / homo_coords[..., -1]
+    # homo_coords = transform_rigid(xyz, projection_matrix)
+    # print(homo_coords.shape)
+    img_coords = homo_coords[..., :2] / homo_coords[..., 2:3]
     return img_coords
