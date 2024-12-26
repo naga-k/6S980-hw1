@@ -45,7 +45,7 @@ def render_point_cloud(
     y_indices_flat = y_indices.flatten()
     batch_indices_flat = batch_indices.flatten()
 
-    print(x_indices_flat.shape, y_indices_flat.shape, batch_indices_flat.shape)
+    # print(x_indices_flat.shape, y_indices_flat.shape, batch_indices_flat.shape)
 
     canvas[batch_indices_flat, y_indices_flat, x_indices_flat] = 0
 

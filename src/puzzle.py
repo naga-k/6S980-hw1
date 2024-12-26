@@ -1,8 +1,12 @@
+import json
+from os import listdir
 from pathlib import Path
 from typing import Literal, TypedDict
 
 from jaxtyping import Float
-from torch import Tensor
+from PIL import Image
+from torch import Tensor, stack
+from torchvision import transforms
 
 
 class PuzzleDataset(TypedDict):
@@ -14,7 +18,24 @@ class PuzzleDataset(TypedDict):
 def load_dataset(path: Path) -> PuzzleDataset:
     """Load the dataset into the required format."""
 
-    raise NotImplementedError("This is your homework.")
+    with open(path / "metadata.json", "r") as file:
+        metadata = json.load(file)
+        extrensics = Tensor(metadata["extrinsics"])
+        intrinsics = Tensor(metadata["intrinsics"])
+
+    image_list = []
+
+    for filename in sorted(listdir(path / "images")):
+        pil_img = Image.open(path / "images" / filename)
+        tensor_img = transforms.ToTensor()(pil_img)
+        image_list.append(tensor_img)
+
+    images_tensor = stack(image_list)
+
+    dataset = PuzzleDataset(
+        extrinsics=extrensics, intrinsics=intrinsics, images=images_tensor
+    )
+    return dataset
 
 
 def convert_dataset(dataset: PuzzleDataset) -> PuzzleDataset:
@@ -29,7 +50,7 @@ def convert_dataset(dataset: PuzzleDataset) -> PuzzleDataset:
 
     """
 
-    raise NotImplementedError("This is your homework.")
+    return dataset
 
 
 def quiz_question_1() -> Literal["w2c", "c2w"]:
